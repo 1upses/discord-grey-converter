@@ -1,8 +1,8 @@
 # discord-grey-converter
 
-just double click on main.py and let the magic appears, but make sure you installed the Pillow package first
+just double click on main.py and let the magic appears, but make sure you installed the Pillow and tkinter packages first
 
 exemple:
 https://cdn.discordapp.com/attachments/442057924517429248/820761671529529354/grey-fb.png
 
-maybe in the future I'll add a way to support jpg images, add a gui, and a way to add text without an external app, but I'm too busy rn
+took a program I made 2 years ago and decided to add a graphical interface in a small hour or so to learn a bit about tkinter

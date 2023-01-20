@@ -1,25 +1,78 @@
-#Copyright (c) 2020, 1ups_ Inc.  All rights reserved.
-#Copyrights licensed under the GNU General Public License v3.0.
-#See the accompanying LICENSE file for terms.
+import tkinter as tk
+from PIL import Image, ImageTk
+import os
 
-from PIL import Image
+im1 = None
 
-filename = str(input("file name (png format): "))
-im1 = Image.open(filename)
-L,H=im1.size
+def threshold_change(val):
+    threshold_value.set(int(val))
 
-treshold = int(input("treshold (0-255): "))
+def on_submit():
+    global im1
+    os.system(f"py compute_image.py \"{filepath_entry.get()}\" \"{threshold_value.get()}\" \"{text_entry.get()}\"")
+    im1 = Image.open("grey-" + filepath_entry.get())
+    im1 = ImageTk.PhotoImage(im1)
+    image_label.configure(image=im1)
+    image_label.image = im1
 
-im2 = Image.new("RGBA",(L,H))
-for y in range(H):
-    for x in range(L):
-        p = im1.getpixel((x,y))
-        gris = int((p[0]+p[1]+p[2])//3)
-        if gris > treshold:
-            im2.putpixel((x,y),(0,0,0,0))
-        else:
-            im2.putpixel((x,y),(54,57,62,255))
+def on_focus_in(event):
+    if filepath_entry.get() == "filepath":
+        filepath_entry.delete(0, "end")
+        filepath_entry.config(fg = 'black')
+    if text_entry.get() == "text":
+        text_entry.delete(0, "end")
+        text_entry.config(fg = 'black')
 
-chaine = "grey-"+filename
-im2.save(chaine)
-im2.show()
+def on_focus_out(event):
+    if not filepath_entry.get():
+        filepath_entry.insert(0, "filepath")
+        filepath_entry.config(fg = 'grey')
+    if not text_entry.get():
+        text_entry.insert(0, "text")
+        text_entry.config(fg = 'grey')
+
+root = tk.Tk()
+root.title("Discord Grey Converter")
+
+filepath = tk.StringVar()
+text = tk.StringVar()
+threshold_value = tk.IntVar()
+
+screen_width = root.winfo_screenwidth()
+screen_height = root.winfo_screenheight()
+
+width = int(screen_width * 0.4)
+height = int(screen_height * 0.4)
+
+x = (screen_width/2) - (width/2)
+y = (screen_height/2) - (height/2)
+
+root.geometry("%dx%d+%d+%d" % (width, height, x, y))
+
+threshold_label = tk.Label(root, text="threshold")
+threshold_label.pack()
+
+threshold_slider = tk.Scale(root, from_=0, to=255, orient='horizontal', variable = threshold_value, command=threshold_change)
+threshold_slider.pack()
+
+filepath_entry = tk.Entry(root, textvariable=filepath)
+filepath_entry.insert(0, "filepath")
+filepath_entry.config(fg = 'grey')
+filepath_entry.pack()
+filepath_entry.bind("<FocusIn>", on_focus_in)
+filepath_entry.bind("<FocusOut>", on_focus_out)
+
+text_entry = tk.Entry(root, textvariable=text)
+text_entry.insert(0, "text")
+text_entry.config(fg = 'grey')
+text_entry.pack()
+text_entry.bind("<FocusIn>", on_focus_in)
+text_entry.bind("<FocusOut>", on_focus_out)
+
+image_label = tk.Label(root)
+image_label.pack()
+
+submit_button = tk.Button(root, text='Submit', command=on_submit)
+submit_button.pack()
+
+root.mainloop()
